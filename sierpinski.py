@@ -26,8 +26,8 @@ def get_mid_val(val1, val2):
 
 def get_mid_point(point1: Point, point2: Point):
     return Point(
-        get_mid_val(point1.x, point2.x),
-        get_mid_val(point1.y, point2.y)
+        get_mid_val(point1.get_x(), point2.get_x()),
+        get_mid_val(point1.get_y(), point2.get_y())
     )
 
 
@@ -64,7 +64,7 @@ def sierpinski(triangle: Triangle, level, graphics: Graphics):
     """
     Draw the Sierpinski triangle.
     """    
-    assert (level >= 0), "level must be >= 0"
+    assert (level >= 0), 'level must be >= 0'
     if level == 0:
         graphics.draw_polygon(triangle, level)
     else:

@@ -24,56 +24,53 @@ from sierpinski import sierpinski
 from params import SIDE_LEN, MARGIN_WIDTH, COLOURS, OUTPUT_PATH
 
 
+# The amount by which the side length of an equilateral triangle with a
+# horizontal base is to be multiplied to get the height of the
+# triangle.
+SIDE_LEN_TO_HEIGHT_MULTIPLIER = math.sin(math.pi / 3.0)
+
+
 def get_triangle_height(side_len):
-    return math.sin(math.pi / 3.0) * side_len
+    return side_len * SIDE_LEN_TO_HEIGHT_MULTIPLIER
 
 
-def get_main_triangle_dimensions(side_len, margin_width):
+def get_main_triangle(side_len, margin_width) -> Triangle:
     """
-    Return the dimensions of the main (outermost) triangle (an 
-    equilateral triangle with a horizontal base).
- 
-    Parameters:
-    side_len -- The length of each side of the triangle.
-    margin_width -- The width of the margin around the triangle.
-
-    Return value:
-    Length-2 tuple containing:
-    -- The main triangle (Triangle class instance).
-    -- The height of the main triangle.
+    Return the main (outermost) triangle (an equilateral triangle with
+    a horizontal base).
     """
     height = get_triangle_height(side_len)
 
     lower_left = Point(margin_width, margin_width)
     top = Point(margin_width + side_len / 2.0, margin_width + height)
     lower_right = Point(margin_width + side_len, margin_width)
-    
-    triangle = Triangle(lower_left, top, lower_right)
 
-    return (triangle, height)
+    return Triangle(lower_left, top, lower_right)
+
+
+def get_display_dimensions(main_triangle_side_len, margin_width):
+    triangle_height = get_triangle_height(main_triangle_side_len)
+
+    padding = 2.0 * margin_width
+    display_height = math.ceil(triangle_height) + padding
+    display_width = main_triangle_side_len + padding
+
+    return DisplayDimensions(height = display_height, width = display_width)    
 
 
 def main():
-    triangle, triangle_height = get_main_triangle_dimensions(
-        SIDE_LEN, MARGIN_WIDTH)
-
-    padding = 2.0 * MARGIN_WIDTH
-    display_width = SIDE_LEN + padding
-    display_height = math.ceil(triangle_height) + padding
-    display_dimensions = DisplayDimensions(
-        height = display_height,
-        width = display_width
-    )    
+    display_dimensions = get_display_dimensions(SIDE_LEN, MARGIN_WIDTH)
     graphics = Graphics(display_dimensions, COLOURS)
 
+    main_triangle = get_main_triangle(SIDE_LEN, MARGIN_WIDTH)
     initial_level = len(COLOURS) - 1
-    sierpinski(triangle, initial_level, graphics)
-    
+    sierpinski(main_triangle, initial_level, graphics)
+
     status = graphics.save(OUTPUT_PATH)
     if not status.ok:
         print(status.err_str)
         return 1
-    print("Created {}.".format(OUTPUT_PATH))
+    print('Created {}.'.format(OUTPUT_PATH))
     return 0
 
 

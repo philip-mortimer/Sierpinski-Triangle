@@ -17,15 +17,15 @@
 
 
 class Status:
-    def __init__(self, ok, err_str = ""):
-        self.__ok = ok
-        self.__err_str = err_str
+    def __init__(self, ok, err_str = ''):
+        self._ok = ok
+        self._err_str = err_str
 
     @property
     def ok(self):
-        return self.__ok
+        return self._ok
 
     @property
     def err_str(self):
-        return self.__err_str
+        return self._err_str
 

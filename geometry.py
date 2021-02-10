@@ -18,30 +18,24 @@
 
 class Point:
     def __init__(self, x, y):
-        self.__x = x
-        self.__y = y
+        self._x = x
+        self._y = y
 
-    @property
-    def x(self):
-        return self.__x
+    def get_x(self):
+        return self._x
 
-    @property
-    def y(self):
-        return self.__y
+    def get_y(self):
+        return self._y
 
 
 class Triangle:
     def __init__(self, corner0: Point, corner1: Point, corner2: Point):
-        self.__corners = (corner0, corner1, corner2)
-    
-    @property
-    def corners(self):
-        return self.__corners
+        self._corners = (corner0, corner1, corner2)
 
     def __getitem__(self, index):
-        return self.corners[index]
-    
+        return self._corners[index]
+
     def __iter__(self):
-        return iter(self.corners)
+        return iter(self._corners)
 
 

@@ -26,13 +26,13 @@ MARGIN_WIDTH = 10
 # recursive level, so the number of recursive levels equals the number 
 # of colours.
 COLOURS = [
-    "rgb(150,150,150)",
-    "rgb(171,171,171)",
-    "rgb(192,192,192)",
-    "rgb(213,213,213)",
-    "rgb(234,234,234)",
-    "rgb(255,255,255)"
+    'rgb(150,150,150)',
+    'rgb(171,171,171)',
+    'rgb(192,192,192)',
+    'rgb(213,213,213)',
+    'rgb(234,234,234)',
+    'rgb(255,255,255)'
 ]
 
-OUTPUT_PATH = "sierpinski.svg"
+OUTPUT_PATH = 'sierpinski.svg'
 

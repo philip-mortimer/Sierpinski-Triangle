@@ -31,39 +31,66 @@ SVG_INFO = 'xmlns="http://www.w3.org/2000/svg" version="1.1"'
 
 class DisplayDimensions:
     def __init__(self, height, width):
-        self.__height = height
-        self.__width = width
+        self._height = height
+        self._width = width
 
     @property
     def height(self):
-        return self.__height
+        return self._height
 
     @property
     def width(self):
-        return self.__width
+        return self._width
+
+    
+def create_point_string(point: Point, display_height):
+    x = round(point.get_x())
+    y = display_height - round(point.get_y())
+    return '{:g},{:g}'.format(x, y)
+
+
+def create_points_string(points, display_height):
+    point_strings = [
+        create_point_string(point, display_height) for point in points
+    ]
+    return ' '.join(point_strings)
+
+
+def create_polygon_command(points, colour, display_height):
+    points_string = create_points_string(points, display_height)
+    command = '   <polygon points="{}" style="fill:{}"/>\n'.format(
+        points_string, colour)
+    return command
+
+
+def create_svg_header(display_dimensions: DisplayDimensions):
+    height_width = 'height="{:g}" width="{:g}"'.format(
+        display_dimensions.height, display_dimensions.width)
+
+    header = '{}\n<svg {}\n  {}>\n'.format(XML_INFO, SVG_INFO, height_width)
+    return header
 
 
 class Graphics:
     """
     Class for graphical output. 
-    
-    This version of the class generates SVG code and saves it to a 
+
+    This version of the class generates SVG code and saves it to a
     file.
     """
     def __init__(self, display_dimensions: DisplayDimensions, colours): 
         """
         Parameters:
-        display_dimensions -- The height and width of the display area.        
-        colours -- A list (or other object whose elements can be
-          accessed with the '[]' operator with an integer index)
-          containing strings representing colours e.g 'red',
+        display_dimensions -- The height and width of the display area.
+        colours -- A list (or an object indexable in the same way as a
+          list) containing strings representing colours e.g 'red',
           'rgb(46,41,51)'.
         """
-        self.__display_dimensions = display_dimensions
-        self.__colours = colours
+        self._display_dimensions = display_dimensions
+        self._colours = colours
 
-        self.__commands = ""
-        self.__polygon_count = 0
+        self._commands = ''
+        self._polygon_count = 0
 
     def draw_polygon(self, points, fill_colour_index):
         """
@@ -74,40 +101,24 @@ class Graphics:
           the colours in the colours object passed to the
           constructor.
         """
-        assert (self.__polygon_count < MAX_POLYGONS), TOO_MANY_POLYGONS_ERR 
+        assert (self._polygon_count < MAX_POLYGONS), TOO_MANY_POLYGONS_ERR
 
-        point_strings = [self.__format_point(point) for point in points]
-        points = " ".join(point_strings)
-        command = "   <polygon points=\"{}\" style=\"fill:{}\"/>\n".format(
-            points, self.__colours[fill_colour_index])
+        colour = self._colours[fill_colour_index]
+        command = create_polygon_command(
+            points, colour, self._display_dimensions.height)
 
-        self.__commands += command
-        self.__polygon_count += 1
+        self._commands += command
+        self._polygon_count += 1
 
     def save(self, path) -> Status:
-        height_width = "height=\"{:g}\" width=\"{:g}\"".format(
-            self.__display_dimensions.height,
-            self.__display_dimensions.width)
-            
-        header = "{}\n<svg {}\n     {}>\n".format(
-            XML_INFO, SVG_INFO, height_width)
-        footer = "</svg>\n"
-        content = header + self.__commands + footer
+        header = create_svg_header(self._display_dimensions)
+        content = header + self._commands + '</svg>\n'
 
         status = Status(ok=True)
         try:
-            with open(path, "w") as svg_file:
+            with open(path, 'w') as svg_file:
                 svg_file.write(content)
         except Exception as e:
-            err_str = "Error writing to {}: {}.".format(path, str(e))
+            err_str = 'Error writing to {}: {}.'.format(path, str(e))
             status = Status(ok=False, err_str=err_str)
         return status
-    
-    def __format_point(self, point: Point):
-        x = round(point.x)
-        y = self.__display_dimensions.height - round(point.y)
-        return "{:g},{:g}".format(x, y)
-
-
-
-
